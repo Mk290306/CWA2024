@@ -1,0 +1,111 @@
+# This program takes three values from a CSV file and compares them to predict a fourth value
+# This program then attempts to execute a "Multiple Linear Regression" AR1
+# using 3 independent variables and one dependent variable.       AR1
+# The program uses input parameters from the user to make a prediction   AR1
+# The program the considers a number of WHAT-IF scenarios using the "trained" model AR2
+# to make further predictions
+# The program then produces the outcomes from above in a graphical format   AR3
+# My program is processing a dataset that originates from an embedded system which senses light
+# and uses that data along with user input to test/train a model which predicts mood
+# Some Standards: All functions will be at the top of the code, All import statements will be at the top of the code
+
+#Import Statements
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# Prediction function to predict using 3 independent variables and one dependent variable.
+def predict_mood(hours_of_sunlight, sunlight_intensity, peak_sunlight_intensity):
+    df = pd.DataFrame([[hours_of_sunlight, sunlight_intensity, peak_sunlight_intensity]],
+                      columns=['Hours_light', 'Intensity_Light', 'Peak_Light'])
+    return my_model.predict(df)[0]
+
+# Training the model
+# first Load your dataset
+data = pd.read_csv('AR1-3_Input.csv') # This dataset is a copy of the output from BR1-3, copied so as to create a backup of BR1-3 data
+
+# Define your independent variables (features) and dependent variable (target)
+X = data[['light min', 'light_max', 'light mean']]
+Y = data['avg mood']
+
+# Splitting the dataset into training and test sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
+
+# Creating the Linear Regression model
+my_model = LinearRegression()
+
+# Fitting the model with the training data
+my_model.fit(X_train, Y_train)
+
+# Predicting mood scores for the test set
+Y_pred = my_model.predict(X_test)
+
+
+print("My Multiple Linear Regression Model is now Complete!")
+
+# Making a prediction using the model
+# Let the user enter their own 3 parameters
+# Note 2 different datatypes
+print("")
+print("USER ANWSERS 3 QUESTIONS")
+hours_of_screentime = int(input("Enter your avg screentime from 0-24 hours "))
+average_screenlight = float(input("Enter average screenlight intensity. Can be anything from 1-800 "))
+activity = float(input("Enter amount of time you spend away from your phone doing physical activity or otherwise can be anything from 1-24 hours a day "))
+
+predicted_mood = predict_mood(hours_of_screentime, average_screenlight, activity)  # Example values
+print("\n The Predicted Mood Score for the values entered is", predicted_mood)
+
+#___________________What If Questions AR2 _________
+# WHAT-IF Q1
+# What is will your mood be with low values given to the 3 params?
+print("-----------------------------------------------------------")
+print("WHAT-IF QUESTION 1")
+print("Let's test your mood when your screentime is healthy/")
+
+
+mood_if_hours_of_screentime = predict_mood(hours_of_screentime, average_screenlight, activity)  # Example values
+print("\n The low sun score mood is", mood_if_hours_of_screentime)
+
+# WHAT-IF Q2
+# What is will your mood be with high values given to the 3 params?
+print("-----------------------------------------------------------")
+print("WHAT-IF QUESTION 2")
+print("Let's test what the mood will be if the screenlight is low")
+
+
+
+mood_if_average_screenlight = predict_mood(hours_of_screentime, average_screenlight, activity)  # Example values
+print("\n The higher average_screenlight mood is", mood_if_average_screenlight)
+
+# WHAT IF Q3
+# # What is will your mood be with middle/normal values given to the 3 params?
+print("-----------------------------------------------------------")
+print("WHAT-IF QUESTION 3")
+print("Let's test mood if medium activity")
+
+
+
+mood_if_activity = predict_mood(hours_of_screentime, average_screenlight, activity)
+print("\n The average activity Score mood is", mood_if_activity)
+print("")
+
+# Data: names of the variables and their values for the Bar Chart    AR3
+#------------------------------------
+# AR3 Users can view data in a graphical format which displays information such as their progress
+#using the system or the results of a ‘what if’ scenario.
+
+# Data: names of the variables and their values for the chart
+variable_names = ['screentime', 'screenlight','activity']
+values = [mood_if_hours_of_screentime, mood_if_average_screenlight,mood_if_activity]
+
+# Creating the bar chart
+plt.bar(variable_names, values)
+
+# Adding labels and title
+plt.xlabel('Time_Light_Activity')
+plt.ylabel('Users Moods')
+plt.title('Bar Chart of all 3 WHAT-IFs Predictions')
+
+# Show the plot
+plt.show()
